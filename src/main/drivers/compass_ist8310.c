@@ -94,10 +94,6 @@
 // Parameter
 // ODR = Output Data Rate, we use single measure mode for getting more data.
 #define IST8310_ODR_SINGLE 0x01
-#define IST8310_ODR_10_HZ 0x03
-#define IST8310_ODR_20_HZ 0x05
-#define IST8310_ODR_50_HZ 0x07
-#define IST8310_ODR_100_HZ 0x06 
 
 // Device ID (ist8310 -> 0x10)
 #define IST8310_CHIP_ID 0x10
@@ -179,9 +175,8 @@ void ist8310Init(void)
     i2cWrite(MAG_I2C_INSTANCE, IST8310_ADDRESS, IST8310_REG_CNTRL1, IST8310_ODR_SINGLE);
     delay(5);
     i2cWrite(MAG_I2C_INSTANCE, IST8310_ADDRESS, IST8310_REG_AVERAGE, IST8310_AVG_16);
-    delay(5);
+    delay(6);
     ist8310Read(magADC);
-    delay(5);
     i2cWrite(MAG_I2C_INSTANCE, IST8310_ADDRESS, IST8310_REG_CNTRL1, IST8310_ODR_SINGLE);
 
     ist8310ConfigureDataReadyInterruptHandling();
@@ -191,6 +186,7 @@ bool ist8310Read(int16_t *magData)
 {
     uint8_t buf[6];
     uint8_t LSB2FSV = 3; // 3mG - 14 bit
+    // it need at least 6ms in each getting mag data 
     bool ack = i2cRead(MAG_I2C_INSTANCE, IST8310_ADDRESS, IST8310_REG_DATA, 6, buf);
     if (!ack) {
         return false;
